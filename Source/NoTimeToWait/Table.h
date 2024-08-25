@@ -4,19 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Food.generated.h"
+#include "GameplayTagContainer.h"
+#include "Table.generated.h"
 
 class UBoxComponent;
 class UTagHandlerComponent;
 
 UCLASS()
-class NOTIMETOWAIT_API AFood : public AActor
+class NOTIMETOWAIT_API ATable : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AFood();
+	ATable();
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,14 +29,21 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UBoxComponent> CollisionComp;
+	TObjectPtr<UBoxComponent> InteractionComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> FoodMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> PlateMesh;
+	TObjectPtr<UStaticMeshComponent> TableMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UTagHandlerComponent> TagHandler;
+
+	UFUNCTION()
+	void OnInteractionComponentOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	void OnCustomerLeave();
+
+	TObjectPtr<AActor> ServedObject;
+	FGameplayTagContainer RequiredInteractionTags;
 };

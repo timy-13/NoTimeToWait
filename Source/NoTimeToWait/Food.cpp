@@ -4,6 +4,7 @@
 #include "Food.h"
 #include "Components/BoxComponent.h"
 #include "TagHandlerComponent.h"
+#include "NTTWGameplayTags.h"
 
 // Sets default values
 AFood::AFood()
@@ -20,7 +21,9 @@ AFood::AFood()
 	FoodMesh = CreateDefaultSubobject<UStaticMeshComponent>("Food Mesh");
 	FoodMesh->SetupAttachment(PlateMesh, FName("FoodSocket"));
 
-	TagHandlerComponent = CreateDefaultSubobject<UTagHandlerComponent>("Tag Handler Component");
+	TagHandler = CreateDefaultSubobject<UTagHandlerComponent>("Tag Handler");
+	TagHandler->AddTag(NTTWGameplayTags::TAG_Food);
+	TagHandler->AddTag(NTTWGameplayTags::TAG_Interaction_NotGrabbed);
 }
 
 // Called when the game starts or when spawned

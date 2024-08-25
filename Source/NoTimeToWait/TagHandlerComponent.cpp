@@ -34,12 +34,17 @@ bool UTagHandlerComponent::HasMatchingGameplayTag(FGameplayTag TagToCheck) const
 	return Tags.HasTag(TagToCheck);
 }
 
+bool UTagHandlerComponent::HasAllMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const
+{
+	return Tags.HasAll(TagContainer);
+}
+
 void UTagHandlerComponent::AddTag(const FGameplayTag& Tag)
 {
 	Tags.AddTag(Tag);
 }
 
-void UTagHandlerComponent::RemoveTag(const FGameplayTag& Tag)
+bool UTagHandlerComponent::RemoveTag(const FGameplayTag& Tag)
 {
-	Tags.RemoveTag(Tag);
+	return Tags.RemoveTag(Tag);
 }

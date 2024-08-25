@@ -71,6 +71,7 @@ void UGrabber::Grab()
 		if (UActorComponent* TagHandler = HitActor->FindComponentByClass(UTagHandlerComponent::StaticClass()))
 		{
 			Cast<UTagHandlerComponent>(TagHandler)->AddTag(NTTWGameplayTags::TAG_Interaction_Grabbed);
+			Cast<UTagHandlerComponent>(TagHandler)->RemoveTag(NTTWGameplayTags::TAG_Interaction_NotGrabbed);
 		}
 
 		HitActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -90,6 +91,7 @@ void UGrabber::Release()
 		PhysicsHandle->GetGrabbedComponent()->WakeAllRigidBodies();
 		if (UActorComponent* TagHandler = PhysicsHandle->GetGrabbedComponent()->GetOwner()->FindComponentByClass(UTagHandlerComponent::StaticClass()))
 		{
+			Cast<UTagHandlerComponent>(TagHandler)->AddTag(NTTWGameplayTags::TAG_Interaction_NotGrabbed);
 			Cast<UTagHandlerComponent>(TagHandler)->RemoveTag(NTTWGameplayTags::TAG_Interaction_Grabbed);
 		}
 		PhysicsHandle->ReleaseComponent();

@@ -7,8 +7,6 @@
 #include "GameplayTagAssetInterface.h"
 #include "TagHandlerComponent.generated.h"
 
-struct FGameplayTagContainer;
-
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class NOTIMETOWAIT_API UTagHandlerComponent : public UActorComponent, public IGameplayTagAssetInterface
 {
@@ -25,8 +23,9 @@ protected:
 public:	
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 	virtual bool HasMatchingGameplayTag(FGameplayTag TagToCheck) const override;
+	virtual bool HasAllMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const override;
 	void AddTag(const FGameplayTag& Tag);
-	void RemoveTag(const FGameplayTag& Tag);
+	bool RemoveTag(const FGameplayTag& Tag);
 
 private:
 	FGameplayTagContainer Tags;
