@@ -2,11 +2,8 @@
 
 
 #include "Food.h"
-
 #include "Components/BoxComponent.h"
-
-UE_DEFINE_GAMEPLAY_TAG(TAG_Food_Bread, "Food.Bread");
-UE_DEFINE_GAMEPLAY_TAG(TAG_Food_Watermelon, "Food.Watermelon");
+#include "TagHandlerComponent.h"
 
 // Sets default values
 AFood::AFood()
@@ -22,6 +19,8 @@ AFood::AFood()
 
 	FoodMesh = CreateDefaultSubobject<UStaticMeshComponent>("Food Mesh");
 	FoodMesh->SetupAttachment(PlateMesh, FName("FoodSocket"));
+
+	TagHandlerComponent = CreateDefaultSubobject<UTagHandlerComponent>("Tag Handler Component");
 }
 
 // Called when the game starts or when spawned

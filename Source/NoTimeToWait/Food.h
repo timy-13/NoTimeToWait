@@ -4,13 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "NativeGameplayTags.h"
 #include "Food.generated.h"
 
 class UBoxComponent;
-
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Food_Bread);
-UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Food_Watermelon);
+class UTagHandlerComponent;
 
 UCLASS()
 class NOTIMETOWAIT_API AFood : public AActor
@@ -31,14 +28,14 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* CollisionComp;
+	TObjectPtr<UBoxComponent> CollisionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* FoodMesh;
+	TObjectPtr<UStaticMeshComponent> FoodMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* PlateMesh;
+	TObjectPtr<UStaticMeshComponent> PlateMesh;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Food")
-	FGameplayTag FoodTag;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UTagHandlerComponent> TagHandlerComponent;
 };
