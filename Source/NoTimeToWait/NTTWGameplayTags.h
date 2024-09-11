@@ -20,7 +20,14 @@ namespace NTTWGameplayTags
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Table_Customer_NotServed);
 
-	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Table_NoCustomer);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Table_Customer_WaitingForFood);
 
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Table_Customer_WaitingForMenu);
+
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Table_Empty);
+
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Table_Dirty);
+
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Customer_Normal);
 }
 

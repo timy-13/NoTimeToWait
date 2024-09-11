@@ -8,7 +8,6 @@
 #include "Kitchen.generated.h"
 
 class AFood;
-struct FGameplayTag;
 
 UCLASS()
 class NOTIMETOWAIT_API AKitchen : public AActor
@@ -27,14 +26,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	void OnCustomerOrder(TSubclassOf<AFood> Food);
+	void OnCustomerOrder(const FGameplayTag& FoodType);
 
+private:
 	void InitializeFoodClassMap();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> CounterMesh;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Food")
+	UPROPERTY(EditDefaultsOnly, Category = "Food", meta = (AllowPrivateAccess = "true"))
 	TMap<FGameplayTag, TSubclassOf<AFood>> FoodClassMap;
 };

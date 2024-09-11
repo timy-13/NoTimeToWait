@@ -29,6 +29,11 @@ void UTagHandlerComponent::GetOwnedGameplayTags(FGameplayTagContainer& TagContai
 	TagContainer = Tags;
 }
 
+FGameplayTagContainer UTagHandlerComponent::GetOwnedGameplayTags() const
+{
+	return Tags;
+}
+
 bool UTagHandlerComponent::HasMatchingGameplayTag(FGameplayTag TagToCheck) const
 {
 	return Tags.HasTag(TagToCheck);
@@ -37,6 +42,16 @@ bool UTagHandlerComponent::HasMatchingGameplayTag(FGameplayTag TagToCheck) const
 bool UTagHandlerComponent::HasAllMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const
 {
 	return Tags.HasAll(TagContainer);
+}
+
+bool UTagHandlerComponent::HasExactMatchingGameplayTag(FGameplayTag TagToCheck) const
+{
+	return Tags.HasTagExact(TagToCheck);
+}
+
+bool UTagHandlerComponent::HasAnyExactMatchingGameplayTag(const FGameplayTagContainer& TagContainer) const
+{
+	return Tags.HasAnyExact(TagContainer);
 }
 
 void UTagHandlerComponent::AddTag(const FGameplayTag& Tag)

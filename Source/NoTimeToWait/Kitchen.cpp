@@ -24,7 +24,7 @@ void AKitchen::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	OnCustomerOrder(FoodClassMap[NTTWGameplayTags::TAG_Food_Bread]);
+	OnCustomerOrder(NTTWGameplayTags::TAG_Food_Bread);
 }
 
 // Called every frame
@@ -42,8 +42,16 @@ void AKitchen::InitializeFoodClassMap()
 	FoodClassMap.Add(NTTWGameplayTags::TAG_Food_Watermelon, FoodClass);
 }
 
-void AKitchen::OnCustomerOrder(TSubclassOf<AFood> Food)
+void AKitchen::OnCustomerOrder(const FGameplayTag& FoodType)
 {
-	GetWorld()->SpawnActor<AFood>(Food, GetActorLocation() + FVector(0, 0, 50.f), GetActorRotation());
+	// subscribe to delegate when npc orders food
+	// spawn the food that the npc wants
+
+	// spawn location should change as more food is spawned
+	// check for empty spots along counter??
+	// have several box components, check for an empty one, if none are empty just spawn in the air?
+	//Food = GetWorld()->SpawnActor<AFood>(GetActorLocation(), GetActorRotation());
+
+	GetWorld()->SpawnActor<AFood>(FoodClassMap[FoodType], GetActorLocation() + FVector(0, 0, 50.f), GetActorRotation());
 }
 

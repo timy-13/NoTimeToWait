@@ -3,9 +3,14 @@
 
 #include "Table.h"
 
-#include "Components/BoxComponent.h"
 #include "TagHandlerComponent.h"
 #include "NTTWGameplayTags.h"
+#include "Customer.h"
+#include "Kitchen.h"
+#include "Food.h"
+#include "TableManagerSubsystem.h"
+
+#include "Components/BoxComponent.h"
 #include "GameplayTags.h"
 
 // Sets default values
@@ -22,9 +27,8 @@ ATable::ATable()
 	InteractionComponent->SetupAttachment(TableMesh);
 
 	TagHandler = CreateDefaultSubobject<UTagHandlerComponent>(TEXT("Tag Handler"));
-
-	RequiredInteractionTags.AddTag(NTTWGameplayTags::TAG_Food);
-	RequiredInteractionTags.AddTag(NTTWGameplayTags::TAG_Interaction_NotGrabbed);
+	TagHandler->AddTag(NTTWGameplayTags::TAG_Table_Empty);
+	//RequiredInteractionTags.AddTag(NTTWGameplayTags::TAG_Table_Empty);
 }
 
 // Called when the game starts or when spawned
@@ -46,15 +50,66 @@ void ATable::OnInteractionComponentOverlap(UPrimitiveComponent* OverlappedCompon
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult)
 {
-	UTagHandlerComponent* ActorTagHandler = OtherActor->FindComponentByClass<UTagHandlerComponent>();
-	if (ActorTagHandler && ActorTagHandler->HasAllMatchingGameplayTags(RequiredInteractionTags))
+	if (AFood* Food = Cast<AFood>(OtherActor))
 	{
-		ServedObject = OtherActor;
-		bool attach = OtherComp->AttachToComponent(TableMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("FoodSocket"));
+		if (TagHandler->HasExactMatchingGameplayTag(NTTWGameplayTags::TAG_Table_Empty) && Food->GetTagHandler()->HasAnyExactMatchingGameplayTag(OrderedFoodTags))
+		{
+			ServedObject = OtherActor;
+			OrderedFoodTags.RemoveTags(Food->GetTagHandler()->GetOwnedGameplayTags()); // remove the fulfilled food type
+			bool attach = OtherComp->AttachToComponent(TableMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("FoodSocket"));
+			Customer->OnReceivedFood();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Table must be empty/Must be correct food. CustomerFood: %s, OrderedTag: %s"), *Customer->GetFoodType().GetTagName().ToString(), *OrderedFoodTags.First().GetTagName().ToString());
+		}
 	}
+}
+
+void ATable::AddRequiredFood(const FGameplayTag& FoodType)
+{
+	OrderedFoodTags.AddTag(FoodType);
+}
+
+void ATable::Reset()
+{
+	OrderedFoodTags.Reset();
+}
+
+void ATable::SetCustomer(ACustomer* TableCustomer)
+{
+	Customer = TableCustomer;
+}
+
+void ATable::OnReceivedMenu()
+{
+	TagHandler->RemoveTag(NTTWGameplayTags::TAG_Table_Customer_WaitingForMenu);
+	OrderedFoodTags.AddTag(Customer->GetFoodType());
+	if (Kitchen)
+	{
+		Kitchen->OnCustomerOrder(Customer->GetFoodType());
+	}
+	OnReceivedMenuDelegate.Broadcast();
 }
 
 void ATable::OnCustomerLeave()
 {
+	UTableManagerSubsystem* TableManager = GetWorld()->GetSubsystem<UTableManagerSubsystem>();
+	TableManager->AddEmptyTable(this);
+
 	ServedObject->Destroy();
+	TagHandler->AddTag(NTTWGameplayTags::TAG_Table_Dirty);
+	// add dirty dishes mesh
+	Customer = nullptr;
+}
+
+void ATable::Clean()
+{
+	TagHandler->RemoveTag(NTTWGameplayTags::TAG_Table_Dirty);
+	TagHandler->AddTag(NTTWGameplayTags::TAG_Table_Empty);
+}
+
+UTagHandlerComponent* ATable::GetTagHandler() const
+{
+	return TagHandler;
 }

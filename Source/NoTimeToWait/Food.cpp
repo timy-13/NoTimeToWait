@@ -40,3 +40,8 @@ void AFood::Tick(float DeltaTime)
 
 }
 
+UTagHandlerComponent* AFood::GetTagHandler() const
+{
+	return TagHandler;
+}
+

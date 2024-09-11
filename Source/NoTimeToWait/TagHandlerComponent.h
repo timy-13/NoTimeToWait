@@ -22,11 +22,15 @@ protected:
 
 public:	
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
+	FGameplayTagContainer GetOwnedGameplayTags() const;
 	virtual bool HasMatchingGameplayTag(FGameplayTag TagToCheck) const override;
+	bool HasExactMatchingGameplayTag(FGameplayTag TagToCheck) const;
+	bool HasAnyExactMatchingGameplayTag(const FGameplayTagContainer& TagContainer) const;
 	virtual bool HasAllMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const override;
 	void AddTag(const FGameplayTag& Tag);
 	bool RemoveTag(const FGameplayTag& Tag);
 
 private:
+	UPROPERTY(EditAnywhere, Category = "Tags")
 	FGameplayTagContainer Tags;
 };

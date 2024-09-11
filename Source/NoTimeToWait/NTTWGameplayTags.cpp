@@ -19,5 +19,13 @@ namespace NTTWGameplayTags
 
 	UE_DEFINE_GAMEPLAY_TAG(TAG_Table_Customer_NotServed, "Table.Customer.NotServed");
 
-	UE_DEFINE_GAMEPLAY_TAG(TAG_Table_Customer_NoCustomer, "Table.NoCustomer");
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Table_Customer_WaitingForMenu, "Table.Customer.WaitingForMenu");
+
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Table_Customer_WaitingForFood, "Table.Customer.WaitingForFood");
+
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Table_Empty, "Table.Empty");
+
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Table_Dirty, "Table.Dirty");
+
+	UE_DEFINE_GAMEPLAY_TAG(TAG_Customer_Normal, "Customer.Normal");
 }

@@ -9,6 +9,10 @@
 
 class UBoxComponent;
 class UTagHandlerComponent;
+class ACustomer;
+class AKitchen;
+
+DECLARE_MULTICAST_DELEGATE(FOnReceivedMenuSignature);
 
 UCLASS()
 class NOTIMETOWAIT_API ATable : public AActor
@@ -19,6 +23,8 @@ public:
 	// Sets default values for this actor's properties
 	ATable();
 
+	FOnReceivedMenuSignature OnReceivedMenuDelegate;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,6 +32,18 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void AddRequiredFood(const FGameplayTag& FoodType);
+
+	void Reset();
+
+	void SetCustomer(ACustomer* TableCustomer);
+
+	void OnReceivedMenu();
+
+	void Clean();
+
+	UTagHandlerComponent* GetTagHandler() const;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
@@ -45,5 +63,12 @@ private:
 	void OnCustomerLeave();
 
 	TObjectPtr<AActor> ServedObject;
-	FGameplayTagContainer RequiredInteractionTags;
+
+	UPROPERTY(VisibleAnywhere, Category = "Food")
+	FGameplayTagContainer OrderedFoodTags;
+
+	TObjectPtr<ACustomer> Customer;
+
+	UPROPERTY(EditAnywhere, Category = "Food")
+	TObjectPtr<AKitchen> Kitchen;
 };
