@@ -89,6 +89,7 @@ void ANoTimeToWaitCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, GrabberComponent.Get(), &UGrabber::Grab);
 		EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Completed, GrabberComponent.Get(), &UGrabber::Release);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, GrabberComponent.Get(), &UGrabber::Interact);
 	}
 	else
 	{

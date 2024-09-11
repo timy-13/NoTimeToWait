@@ -4,6 +4,7 @@
 #include "Grabber.h"
 #include "NTTWGameplayTags.h"
 #include "TagHandlerComponent.h"
+#include "Table.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 
 // Sets default values for this component's properties
@@ -40,14 +41,14 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	MovePhysicsHandle();
 }
 
-bool UGrabber::IsInRange(FHitResult& HitResult)
+bool UGrabber::IsInRange(FHitResult& HitResult, ECollisionChannel TraceChannel)
 {
 	FVector Start = GetOwner()->GetActorLocation();
 	FVector End = Start + GetOwner()->GetActorForwardVector() * MaxRange;
 
 	DrawDebugLine(GetWorld(), Start, End, FColor::Red);
 
-	return GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeCapsule(GrabHalfHeight, GrabRadius));
+	return GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, TraceChannel, FCollisionShape::MakeCapsule(GrabHalfHeight, GrabRadius));
 }
 
 void UGrabber::Grab()
@@ -59,7 +60,7 @@ void UGrabber::Grab()
 	}
 
 	FHitResult HitResult;
-	if (IsInRange(HitResult))
+	if (IsInRange(HitResult, ECC_GameTraceChannel1))
 	{
 		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
 		HitComponent->SetSimulatePhysics(true);
@@ -73,6 +74,12 @@ void UGrabber::Grab()
 			Cast<UTagHandlerComponent>(TagHandler)->AddTag(NTTWGameplayTags::TAG_Interaction_Grabbed);
 			Cast<UTagHandlerComponent>(TagHandler)->RemoveTag(NTTWGameplayTags::TAG_Interaction_NotGrabbed);
 		}
+		/*UTagHandlerComponent* TagHandler = PhysicsHandle->GetGrabbedComponent()->GetOwner()->FindComponentByClass<UTagHandlerComponent>();
+		if (TagHandler)
+		{
+			TagHandler->RemoveTag(NTTWGameplayTags::TAG_Interaction_NotGrabbed);
+			TagHandler->AddTag(NTTWGameplayTags::TAG_Interaction_Grabbed);
+		}*/
 
 		HitActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		PhysicsHandle->GrabComponentAtLocationWithRotation(HitComponent, NAME_None, HitResult.ImpactPoint, GetOwner()->GetActorRotation());
@@ -94,7 +101,35 @@ void UGrabber::Release()
 			Cast<UTagHandlerComponent>(TagHandler)->AddTag(NTTWGameplayTags::TAG_Interaction_NotGrabbed);
 			Cast<UTagHandlerComponent>(TagHandler)->RemoveTag(NTTWGameplayTags::TAG_Interaction_Grabbed);
 		}
+		//UTagHandlerComponent* TagHandler = PhysicsHandle->GetGrabbedComponent()->GetOwner()->FindComponentByClass<UTagHandlerComponent>();
+		//if (TagHandler)
+		//{
+		//	TagHandler->AddTag(NTTWGameplayTags::TAG_Interaction_NotGrabbed);
+		//	TagHandler->RemoveTag(NTTWGameplayTags::TAG_Interaction_Grabbed);
+		//}
 		PhysicsHandle->ReleaseComponent();
+	}
+}
+
+void UGrabber::Interact()
+{
+	FHitResult HitResult;
+	if (IsInRange(HitResult, ECC_GameTraceChannel2))
+	{
+		AActor* HitActor = HitResult.GetActor();
+		if (ATable* Table = Cast<ATable>(HitActor))
+		{
+			if (Table->GetTagHandler()->HasExactMatchingGameplayTag(NTTWGameplayTags::TAG_Table_Customer_WaitingForMenu)) // menu
+			{
+				Table->OnReceivedMenu();
+			}
+			else if (Table->GetTagHandler()->HasExactMatchingGameplayTag(NTTWGameplayTags::TAG_Table_Dirty))
+			{
+				// clean table
+				Table->Clean();
+				// Cast<Character>(GetOwner())->cleanAnimation
+			}
+		}
 	}
 }
 

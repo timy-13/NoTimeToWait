@@ -28,11 +28,13 @@ public:
 	void Grab();
 	void Release();
 
+	void Interact();
+
 	void SetGrabHalfHeight(const float& HalfHeight);
 	void SetGrabRadius(const float& Radius);
 
 private:
-	bool IsInRange(FHitResult& HitResult);
+	bool IsInRange(FHitResult& HitResult, ECollisionChannel TraceChannel);
 
 	UPhysicsHandleComponent* GetPhysicsHandle() const;
 
