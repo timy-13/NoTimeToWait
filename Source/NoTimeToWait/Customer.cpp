@@ -68,7 +68,7 @@ ATable* ACustomer::GetTable() const
 void ACustomer::SetTable(ATable* CustomerTable)
 {
 	Table = CustomerTable;
-	TableLocation = Table->GetActorLocation();
+	TableLocation = Table->GetSeatLocation();
 	Table->OnReceivedMenuDelegate.AddUObject(this, &ACustomer::OnReceivedMenu);
 	OnCustomerSpawnedDelegate.ExecuteIfBound();
 }

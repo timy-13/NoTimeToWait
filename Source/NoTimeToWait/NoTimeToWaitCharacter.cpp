@@ -39,11 +39,11 @@ ANoTimeToWaitCharacter::ANoTimeToWaitCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	// Create a camera boom (pulls in towards the player if there is a collision)
+	//Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.0f; // The camera follows at this distance behind the character
+	CameraBoom->TargetArmLength = 1800.0f; // The camera follows at this distance behind the character
 	CameraBoom->SetRelativeRotation(FRotator(-70.f, 0.f, 0.f));
 	CameraBoom->bUsePawnControlRotation = false; // Rotate the arm based on the controller
 

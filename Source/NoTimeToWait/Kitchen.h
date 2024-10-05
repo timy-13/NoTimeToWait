@@ -28,6 +28,9 @@ public:
 
 	void OnCustomerOrder(const FGameplayTag& FoodType);
 
+	UFUNCTION(BlueprintCallable)
+	void SetSpawnLocation(const FVector& Location);
+
 private:
 	void InitializeFoodClassMap();
 
@@ -36,4 +39,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Food", meta = (AllowPrivateAccess = "true"))
 	TMap<FGameplayTag, TSubclassOf<AFood>> FoodClassMap;
+
+	FVector SpawnLocation;
+	bool bSpawnLocationSet;
 };

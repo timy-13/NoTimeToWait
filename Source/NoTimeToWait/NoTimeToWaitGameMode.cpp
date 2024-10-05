@@ -2,9 +2,11 @@
 
 #include "NoTimeToWaitGameMode.h"
 #include "NoTimeToWaitCharacter.h"
+#include "NoTimeToWaitPlayerController.h"
 #include "UObject/ConstructorHelpers.h"
 
 #include "NTTWGameplayTags.h"
+#include "Kismet/GameplayStatics.h"
 
 ANoTimeToWaitGameMode::ANoTimeToWaitGameMode()
 {
@@ -20,9 +22,9 @@ void ANoTimeToWaitGameMode::InitGame(const FString& MapName, const FString& Opti
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	Difficulty Easy;
+	FDifficulty Easy;
 	Easy.CustomerNumber = 4;
-	Easy.TotalTime = 120;
+	Easy.TotalTime = 60;
 	Easy.OneStarMoney = 100;
 	Easy.TwoStarMoney = 140;
 	Easy.ThreeStarMoney = 200;
@@ -35,28 +37,31 @@ void ANoTimeToWaitGameMode::InitGame(const FString& MapName, const FString& Opti
 	Normal.EatingTime = 10.f;
 	Normal.Money = 20;
 	CustomerTypes.Add(Normal.Type, Normal);
+
+	StartDelay = 4.f;
+}
+
+void ANoTimeToWaitGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	HandleGameStart();
 }
 
 void ANoTimeToWaitGameMode::StartPlay()
 {
 	Super::StartPlay();
-
-	SetDifficulty(0);
-
-	RemainingMinutes = CurrentDifficulty.TotalTime / 60;
-	RemainingSeconds = CurrentDifficulty.TotalTime % 60;
-
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ANoTimeToWaitGameMode::CountDown, 1.0f, true, 0.f);
-
 }
 
 void ANoTimeToWaitGameMode::EndLevel()
 {
-	// stop player input
+	CalculateFinalScore();
+	PlayerController->SetPlayerEnabledState(false);
+	EndGame();
 	// display endlevel widget
 }
 
-Difficulty ANoTimeToWaitGameMode::GetDifficulty() const
+FDifficulty ANoTimeToWaitGameMode::GetDifficulty() const
 {
 	return CurrentDifficulty;
 }
@@ -84,6 +89,27 @@ float ANoTimeToWaitGameMode::GetPlayerMoney() const
 	return PlayerMoney;
 }
 
+void ANoTimeToWaitGameMode::HandleGameStart()
+{
+	PlayerController = Cast<ANoTimeToWaitPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+
+	if (PlayerController)
+	{
+		PlayerController->SetPlayerEnabledState(false);
+		FTimerHandle PlayerEnableTimerHandle;
+		FTimerDelegate PlayerEnableTimerDelegate = FTimerDelegate::CreateUObject(PlayerController, &ANoTimeToWaitPlayerController::SetPlayerEnabledState, true);
+		GetWorldTimerManager().SetTimer(PlayerEnableTimerHandle, PlayerEnableTimerDelegate, StartDelay, false);
+	}
+
+	StartGame();
+
+	SetDifficulty(0);
+
+	RemainingMinutes = CurrentDifficulty.TotalTime / 60;
+	RemainingSeconds = CurrentDifficulty.TotalTime % 60;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ANoTimeToWaitGameMode::CountDown, 1.0f, true, 0.f);
+}
+
 void ANoTimeToWaitGameMode::CountDown()
 {
 	if (RemainingSeconds > 0)
@@ -99,5 +125,25 @@ void ANoTimeToWaitGameMode::CountDown()
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 		EndLevel();
+	}
+}
+
+void ANoTimeToWaitGameMode::CalculateFinalScore()
+{
+	if (PlayerMoney >= CurrentDifficulty.ThreeStarMoney)
+	{
+		FinalScore = "Three Stars";
+	}
+	else if (PlayerMoney >= CurrentDifficulty.TwoStarMoney)
+	{
+		FinalScore = "Two Stars";
+	}
+	else if (PlayerMoney >= CurrentDifficulty.OneStarMoney)
+	{
+		FinalScore = "One Star";
+	}
+	else
+	{
+		FinalScore = "Zero Stars";
 	}
 }

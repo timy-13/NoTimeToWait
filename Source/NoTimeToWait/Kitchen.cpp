@@ -16,6 +16,8 @@ AKitchen::AKitchen()
 	CounterMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Counter Mesh"));
 	RootComponent = CounterMesh;
 
+	bSpawnLocationSet = false;
+
 	InitializeFoodClassMap();
 }
 
@@ -52,6 +54,18 @@ void AKitchen::OnCustomerOrder(const FGameplayTag& FoodType)
 	// have several box components, check for an empty one, if none are empty just spawn in the air?
 	//Food = GetWorld()->SpawnActor<AFood>(GetActorLocation(), GetActorRotation());
 
-	GetWorld()->SpawnActor<AFood>(FoodClassMap[FoodType], GetActorLocation() + FVector(0, 0, 50.f), GetActorRotation());
+	if (bSpawnLocationSet)
+	{
+		GetWorld()->SpawnActor<AFood>(FoodClassMap[FoodType], SpawnLocation, GetActorRotation());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Food spawn location is not set"));
+	}
 }
 
+void AKitchen::SetSpawnLocation(const FVector& Location)
+{
+	bSpawnLocationSet = true;
+	SpawnLocation = Location;
+}

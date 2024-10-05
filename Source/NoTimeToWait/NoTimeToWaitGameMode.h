@@ -7,12 +7,21 @@
 #include "GameplayTagContainer.h"
 #include "NoTimeToWaitGameMode.generated.h"
 
-struct Difficulty
+USTRUCT(BlueprintType)
+struct FDifficulty
 {
+	GENERATED_BODY()
+
 	int CustomerNumber;
 	int TotalTime;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Game")
 	float OneStarMoney;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Game")
 	float TwoStarMoney;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Game")
 	float ThreeStarMoney;
 };
 
@@ -26,6 +35,7 @@ struct CustomerType
 };
 
 class TableHandler;
+class ANoTimeToWaitPlayerController;
 
 UCLASS(minimalapi)
 class ANoTimeToWaitGameMode : public AGameModeBase
@@ -37,10 +47,11 @@ public:
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
+	virtual void BeginPlay() override;
 	virtual void StartPlay() override;
 	void EndLevel();
 
-	Difficulty GetDifficulty() const;
+	FDifficulty GetDifficulty() const;
 	void SetDifficulty(const int Index);
 
 	CustomerType GetCustomerType(const FGameplayTag& Type) const;
@@ -49,26 +60,45 @@ public:
 	void UpdatePlayerMoney(const float Money);
 
 
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartGame();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void EndGame();
+
 private:
+	void HandleGameStart();
+
 	void CountDown();
 
-	TArray<Difficulty> DifficultyRules; // initialize in InitGame
-	// store difficulty rules
+	void CalculateFinalScore();
+
+	ANoTimeToWaitPlayerController* PlayerController;
+
+	TArray<FDifficulty> DifficultyRules;
 
 	TMap<FGameplayTag, CustomerType> CustomerTypes;
 
-	Difficulty CurrentDifficulty;
+	UPROPERTY(BlueprintReadOnly, Category = "Game", meta = (AllowPrivateAccess = "true"))
+	FDifficulty CurrentDifficulty;
 
 	FTimerHandle TimerHandle;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Money", meta = (AllowPrivateAccess = "true"))
-	float PlayerMoney;
+	UPROPERTY(EditDefaultsOnly, Category = "Game");
+	float StartDelay;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, Category = "Game", meta = (AllowPrivateAccess = "true"))
 	int RemainingMinutes;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Timer", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, Category = "Game", meta = (AllowPrivateAccess = "true"))
 	int RemainingSeconds;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Game", meta = (AllowPrivateAccess = "true"))
+	int PlayerMoney;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Game", meta = (AllowPrivateAccess = "true"))
+	FString FinalScore;
 };
 
 

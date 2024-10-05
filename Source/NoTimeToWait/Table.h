@@ -45,6 +45,11 @@ public:
 
 	UTagHandlerComponent* GetTagHandler() const;
 
+	FVector GetSeatLocation() const;
+	
+	UFUNCTION(BlueprintCallable)
+	void SetSeatLocation(const FVector& Location);
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UBoxComponent> InteractionComponent;
@@ -71,4 +76,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Food")
 	TObjectPtr<AKitchen> Kitchen;
+
+	FVector SeatLocation;
 };

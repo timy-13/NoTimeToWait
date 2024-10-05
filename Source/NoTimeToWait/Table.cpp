@@ -28,7 +28,6 @@ ATable::ATable()
 
 	TagHandler = CreateDefaultSubobject<UTagHandlerComponent>(TEXT("Tag Handler"));
 	TagHandler->AddTag(NTTWGameplayTags::TAG_Table_Empty);
-	//RequiredInteractionTags.AddTag(NTTWGameplayTags::TAG_Table_Empty);
 }
 
 // Called when the game starts or when spawned
@@ -89,6 +88,10 @@ void ATable::OnReceivedMenu()
 	{
 		Kitchen->OnCustomerOrder(Customer->GetFoodType());
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Kitchen is not set from Table. Can't spawn food."));
+	}
 	OnReceivedMenuDelegate.Broadcast();
 }
 
@@ -112,4 +115,14 @@ void ATable::Clean()
 UTagHandlerComponent* ATable::GetTagHandler() const
 {
 	return TagHandler;
+}
+
+FVector ATable::GetSeatLocation() const
+{
+	return SeatLocation;
+}
+
+void ATable::SetSeatLocation(const FVector& Location)
+{
+	SeatLocation = Location;
 }

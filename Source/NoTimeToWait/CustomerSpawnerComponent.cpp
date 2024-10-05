@@ -20,6 +20,8 @@ UCustomerSpawnerComponent::UCustomerSpawnerComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
+
+	TableManager = CreateDefaultSubobject<UTableManagerSubsystem>("Table Manager");
 }
 
 
@@ -46,7 +48,7 @@ void UCustomerSpawnerComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ...
 }
 
-void UCustomerSpawnerComponent::SpawnCustomers(const Difficulty& DifficultyLevel)
+void UCustomerSpawnerComponent::SpawnCustomers(const FDifficulty& DifficultyLevel)
 {
 	DifficultyLevel.CustomerNumber;
 
@@ -66,7 +68,8 @@ void UCustomerSpawnerComponent::SpawnCustomers(const Difficulty& DifficultyLevel
 
 void UCustomerSpawnerComponent::SpawnCustomer(ATable* Table, const FGameplayTag& FoodType)
 {
-	ACustomer* Customer = GetWorld()->SpawnActor<ACustomer>(CustomerClass, GetOwner()->GetActorLocation(), GetOwner()->GetActorRotation());
+
+	ACustomer* Customer = GetWorld()->SpawnActor<ACustomer>(CustomerClass, GetComponentLocation(), GetOwner()->GetActorRotation());
 
 	Customer->SetTable(Table);
 	Customer->SetFoodType(FoodType);

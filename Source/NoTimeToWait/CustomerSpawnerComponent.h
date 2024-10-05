@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
 #include "CustomerSpawnerComponent.generated.h"
 
 class ACustomer;
 class ATable;
 class UTableManagerSubsystem;
 struct FGameplayTag;
-struct Difficulty;
+struct FDifficulty;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class NOTIMETOWAIT_API UCustomerSpawnerComponent : public UActorComponent
+class NOTIMETOWAIT_API UCustomerSpawnerComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
@@ -29,7 +29,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SpawnCustomers(const Difficulty& DifficultyLevel);
+	void SpawnCustomers(const FDifficulty& DifficultyLevel);
 
 private:
 	void SpawnCustomer(ATable* Table, const FGameplayTag& FoodType);
