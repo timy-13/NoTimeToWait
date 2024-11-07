@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "Rat.generated.h"
 
+class UBehaviorTree;
+
 UCLASS()
 class NOTIMETOWAIT_API ARat : public APawn
 {
@@ -26,4 +28,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+    UBehaviorTree* GetBehaviorTree() const;
+
+protected:
+	
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="AI", meta=(AllowPrivateAccess="true"))
+    UBehaviorTree* Tree;
 };

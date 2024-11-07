@@ -3,6 +3,8 @@
 
 #include "Rat.h"
 
+#include "BehaviorTree/BehaviorTree.h"
+
 // Sets default values
 ARat::ARat()
 {
@@ -32,3 +34,7 @@ void ARat::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+UBehaviorTree* ARat::GetBehaviorTree() const
+{
+    return Tree;
+}
