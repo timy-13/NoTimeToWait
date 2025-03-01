@@ -58,7 +58,7 @@ public:
 
 	void OnReceivedMenu();
 	void OnReceivedFood();
-	void Leave();
+	void Leave() const;
 	void Despawn();
 
 	void OnMoveToDespawnFinished(FAIRequestID ID, const FPathFollowingResult& Result);

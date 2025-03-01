@@ -41,7 +41,7 @@ void ACustomerAIController::SetTableLocation()
 
 void ACustomerAIController::SetDespawnLocation()
 {
-	MoveToLocation(Customer->GetDespawnLocation(), 100.f);
+	MoveToLocation(Customer->GetDespawnLocation(), 10.f);
 	GetPathFollowingComponent()->OnRequestFinished.AddUObject(Customer, &ACustomer::OnMoveToDespawnFinished);
 }
 

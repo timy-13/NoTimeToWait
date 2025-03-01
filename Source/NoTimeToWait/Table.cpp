@@ -24,10 +24,14 @@ ATable::ATable()
 
 	// interaction comp should be on top of the table (and slightly peeking over the edge), so it can take objects
 	InteractionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("Interaction Component"));
-	InteractionComponent->SetupAttachment(TableMesh);
+	InteractionComponent->SetupAttachment(RootComponent);
 
 	TagHandler = CreateDefaultSubobject<UTagHandlerComponent>(TEXT("Tag Handler"));
 	TagHandler->AddTag(NTTWGameplayTags::TAG_Table_Empty);
+
+	SeatMarker = CreateDefaultSubobject<USceneComponent>(TEXT("Seat Marker"));
+	SeatMarker->SetupAttachment(RootComponent);
+	SeatMarker->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 }
 
 // Called when the game starts or when spawned
@@ -51,11 +55,31 @@ void ATable::OnInteractionComponentOverlap(UPrimitiveComponent* OverlappedCompon
 {
 	if (AFood* Food = Cast<AFood>(OtherActor))
 	{
+		if (!Customer)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Error: Customer is nullptr in ATable::OnInteractionComponentOverlap()"));
+			return;
+		}
+		
 		if (TagHandler->HasExactMatchingGameplayTag(NTTWGameplayTags::TAG_Table_Empty) && Food->GetTagHandler()->HasAnyExactMatchingGameplayTag(OrderedFoodTags))
 		{
 			ServedObject = OtherActor;
 			OrderedFoodTags.RemoveTags(Food->GetTagHandler()->GetOwnedGameplayTags()); // remove the fulfilled food type
-			bool attach = OtherComp->AttachToComponent(TableMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("FoodSocket"));
+			// bool attach = OtherComp->AttachToComponent(TableMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("FoodSocket"));
+
+			FVector SocketLocation = TableMesh->GetSocketLocation(FName("FoodSocket"));
+			FVector RandomOffset = FVector(FMath::RandRange(-10.f, 10.f), FMath::RandRange(-10.f, 10.f), 0.f);
+			FVector FinalLocation = SocketLocation + RandomOffset;
+			OtherActor->SetActorLocation(FinalLocation);
+
+			// Optionally adjust the rotation to match the table with a slight random variation
+			FRotator TableRotation = TableMesh->GetComponentRotation();
+			FRotator RandomRotOffset = FRotator(0.f, FMath::RandRange(-5.f, 5.f), 0.f);
+			OtherActor->SetActorRotation(TableRotation + RandomRotOffset);
+
+			// Attach the food without forcing it to snap exactly to the socket transform
+			OtherComp->AttachToComponent(TableMesh, FAttachmentTransformRules::KeepWorldTransform);
+			
 			Customer->OnReceivedFood();
 		}
 		else
@@ -119,7 +143,7 @@ UTagHandlerComponent* ATable::GetTagHandler() const
 
 FVector ATable::GetSeatLocation() const
 {
-	return SeatLocation;
+	return SeatMarker ? SeatMarker->GetComponentLocation() : FVector(0.f, 0.f, 0.f);
 }
 
 void ATable::SetSeatLocation(const FVector& Location)

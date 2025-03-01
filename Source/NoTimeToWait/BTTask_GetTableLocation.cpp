@@ -5,6 +5,7 @@
 
 #include "NavigationSystem.h"
 #include "CustomerAIController.h"
+#include "Customer.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 UBTTask_GetTableLocation::UBTTask_GetTableLocation(FObjectInitializer const& ObjectInitializer)
@@ -19,23 +20,24 @@ EBTNodeResult::Type UBTTask_GetTableLocation::ExecuteTask(UBehaviorTreeComponent
 	if (auto* const Controller = Cast<ACustomerAIController>(OwnerComp.GetAIOwner()))
 	{
 		// get Customer
-		if (auto* const Customer = Controller->GetPawn())
+		if (auto* const Customer = Cast<ACustomer>(Controller->GetPawn()))
 		{
-			// get customer location to use as origin
-			auto const Origin = Customer->GetActorLocation();
+			if (Customer->GetTable() != nullptr)
+			{
+				// get customer location to use as origin
+				auto const Origin = Customer->GetActorLocation();
 
-			// get TableLocation
+				// get TableLocation
 
-			// want to have all tables stored in a dictionary?
-			// find a table with the nocustomer value
-			FVector TableLocation = FVector(0, 0, 0);
-
-
-			OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), TableLocation);
-			
-			// finish with success
-			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-			return EBTNodeResult::Succeeded;
+				// want to have all tables stored in a dictionary?
+				// find a table with the nocustomer value
+				FVector TableLocation = Customer->GetTableLocation();
+				OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), TableLocation);
+				
+				// finish with success
+				FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+				return EBTNodeResult::Succeeded;
+			}
 		}
 	}
 

@@ -35,10 +35,22 @@ void UCustomerSpawnerComponent::BeginPlay()
 
 	if (ANoTimeToWaitGameMode* GameMode = Cast<ANoTimeToWaitGameMode>(UGameplayStatics::GetGameMode(this)))
 	{
-		SpawnCustomers(GameMode->GetDifficulty());
+		// SpawnCustomers(GameMode->GetDifficulty());
+
+		// Start spawning with initial delay
+		const float InitialDelay = FMath::RandRange(3.0f, 8.0f);
+		GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &UCustomerSpawnerComponent::SpawnCustomers, InitialDelay, false);
 	}
 }
 
+void UCustomerSpawnerComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+    
+	// Clean up timers when component stops
+	GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(RetrySpawnHandle);
+}
 
 // Called every frame
 void UCustomerSpawnerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -48,32 +60,43 @@ void UCustomerSpawnerComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ...
 }
 
-void UCustomerSpawnerComponent::SpawnCustomers(const FDifficulty& DifficultyLevel)
+void UCustomerSpawnerComponent::SpawnCustomers()
 {
-	DifficultyLevel.CustomerNumber;
+	// DifficultyLevel.CustomerNumber;
 
-	// algorithm to spawn customers at certain intervals
+
+	if (!TableManager)
+	{
+		UE_LOG(LogTemp, Error, TEXT("TableManager is null!"));
+		return;
+	}
 
 	if (ATable* Table = TableManager->GetRandomEmptyTable())
 	{
 		TableManager->RemoveEmptyTable(Table);
 		SpawnCustomer(Table, NTTWGameplayTags::TAG_Food_Bread);
+
+		// Schedule next spawn with variable interval
+		const float NextSpawnDelay = FMath::RandRange(8.0f, 15.0f);
+		GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, this, &UCustomerSpawnerComponent::SpawnCustomers, NextSpawnDelay, false);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No empty tables"));
-		// wait if there are no empty tables
+		UE_LOG(LogTemp, Warning, TEXT("No empty tables - retrying in 10 seconds"));
+		
+		// Retry after delay if no tables available
+		GetWorld()->GetTimerManager().SetTimer(RetrySpawnHandle, this, &UCustomerSpawnerComponent::SpawnCustomers, 10.0f, false);
 	}
 }
 
-void UCustomerSpawnerComponent::SpawnCustomer(ATable* Table, const FGameplayTag& FoodType)
+void UCustomerSpawnerComponent::SpawnCustomer(ATable* Table, const FGameplayTag& FoodType) const
 {
 
 	ACustomer* Customer = GetWorld()->SpawnActor<ACustomer>(CustomerClass, GetComponentLocation(), GetOwner()->GetActorRotation());
 
 	Customer->SetTable(Table);
 	Customer->SetFoodType(FoodType);
-	Customer->SetDespawnLocation(GetOwner()->GetActorLocation());
+	Customer->SetDespawnLocation(GetComponentLocation());
 
 	Table->SetCustomer(Customer);
 }

@@ -24,15 +24,16 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SpawnCustomers(const FDifficulty& DifficultyLevel);
+	void SpawnCustomers();
 
 private:
-	void SpawnCustomer(ATable* Table, const FGameplayTag& FoodType);
+	void SpawnCustomer(ATable* Table, const FGameplayTag& FoodType) const;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	TSubclassOf<ACustomer> CustomerClass;
@@ -42,4 +43,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn", meta = (AllowPrivateAccess = "true"))
 	UTableManagerSubsystem* TableManager;
+
+	FTimerHandle SpawnTimerHandle;
+	FTimerHandle RetrySpawnHandle;
 };

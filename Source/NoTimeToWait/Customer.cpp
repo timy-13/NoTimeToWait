@@ -70,7 +70,9 @@ void ACustomer::SetTable(ATable* CustomerTable)
 	Table = CustomerTable;
 	TableLocation = Table->GetSeatLocation();
 	Table->OnReceivedMenuDelegate.AddUObject(this, &ACustomer::OnReceivedMenu);
-	OnCustomerSpawnedDelegate.ExecuteIfBound();
+	if (!OnCustomerSpawnedDelegate.ExecuteIfBound()) {
+		UE_LOG(LogTemp, Error, TEXT("OnCustomerSpawnedDelegate not bound"));
+	}
 }
 
 FVector ACustomer::GetTableLocation() const
@@ -117,9 +119,11 @@ void ACustomer::OnReceivedFood()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ACustomer::Leave, Type.EatingTime);
 }
 
-void ACustomer::Leave()
+void ACustomer::Leave() const
 {
-	OnCustomerFinishedDelegate.ExecuteIfBound();
+	if (!OnCustomerFinishedDelegate.ExecuteIfBound()) {
+		UE_LOG(LogTemp, Error, TEXT("Customer failed to leave: OnCustomerFinishedDelegate not bound"));
+	}
 }
 
 void ACustomer::Despawn()
